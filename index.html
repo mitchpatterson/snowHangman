@@ -12,12 +12,12 @@
 
 <style>
 	body {margin:0px; padding:0px; background-color:#000;}
-	#myCanvas {position:absolute; background-color:#000;/* cursor: none;*/}
+	#myCanvas {position:absolute; background-color:#000;}
 </style>
 
 <script>
 
-var scaling = "fit"; // fit scales to fit the browser window while keeping the aspect ratio
+var scaling = "full"; // fit scales to fit the browser window while keeping the aspect ratio
 var width = 960;
 var height = 640;
 var frame = new zim.Frame(scaling, width, height); 
@@ -35,7 +35,8 @@ frame.on("ready", function() {
     var squareS = 20;
     
     var imagePath = "img/";
-    var manifest = [{id:"scrollerBack", src:"scrollerBack.png"}];
+    var manifest = [{id:"backdrop", src:"backdrop.jpg"},
+                    {id:"snowman1", src:"snowman-full.png"}];
 
     var preload = new createjs.LoadQueue(false, imagePath);
     preload.loadManifest(manifest);
@@ -45,10 +46,147 @@ frame.on("ready", function() {
     function game() {
         console.log("____Snowman Hangman____"); 
 
-        
+        var bounds = new zim.Rectangle(stageW, stageH, "#BB5145");
+        stage.addChild(bounds);
+
+        var backdropContainer = new zim.Rectangle(800,600,"transparent");
+        bounds.addChild(backdropContainer);
+        backdropContainer.regX = backdropContainer.getBounds().width/2;
+        backdropContainer.regY = backdropContainer.getBounds().height/2;
+        backdropContainer.x = stageW/2;
+        backdropContainer.y = stageH/2;
+        var bdW = backdropContainer.getBounds().width;
+        var bdH = backdropContainer.getBounds().height;
+
+        var backdrop = new createjs.Bitmap(preload.getResult('backdrop'));
+        backdropContainer.addChild(backdrop);
+        zim.scaleTo(backdrop, backdropContainer, 100, 100);
+
+        var snowmen = new zim.Rectangle(250,330,"transparent");
+        backdropContainer.addChild(snowmen);
+        snowmen.regX = snowmen.getBounds().width/2;
+        snowmen.regY = snowmen.getBounds().height;
+        snowmen.x = bdW/7*5;
+        snowmen.y = bdH/3*2;
+
+        var snowman1 = new createjs.Bitmap(preload.getResult('snowman1'));
+        snowmen.addChild(snowman1);
+        zim.scaleTo(snowman1, snowmen, 100, 100);
+
+        var phraseContainer = new zim.Rectangle(400, 50,"transparent");
+        backdropContainer.addChild(phraseContainer);
+        phraseContainer.x = bdW/12;
+        phraseContainer.y = bdH/8;
+
+        var alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
+                        "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
+                        "Y", "Z"];
+
+        var phrases = ["MERRY CHRISTMAS", "DECK THE HALLS", "SILENT NIGHT", "JINGLE BELLS", "SANTA CLAUSE", "RUDOLPH", "TIS THE SEASON", "BAH HUMBUG", "LET IT SNOW", "WHITE CHRISTMAS", "CHRISTMAS EVE", "CORN COB PIPE", "FROSTY"]
+
+        function createPhrase() {
+
+            var phrase;
+            for(j=0;j<phrases.length;j++){
+                var rand = Math.floor(Math.random()*phrases.length);
+                phrase = phrases[rand];
+            }
+
+            var pos = 0;
+            
+            for(i=0; i<phrase.length; i++) {
+                if(phrase[i] != " ") {
+
+                    var container = new zim.Rectangle(25,50,"transparent");
+                    phraseContainer.addChild(container);
+                    container.x = pos;
+                    pos = container.x + 25;
+
+                    var text = new createjs.Text(phrase[i], "20px Arial", "#BB5145");
+                    container.addChild(text);
+                    text.regX = text.getBounds().width/2;
+                    text.regY = text.getBounds().height/2;
+                    text.x = container.getBounds().width/2;
+                    text.y = container.getBounds().height/2;
+                    text.alpha = 0;
+                    container.letter = phrase[i];
+
+                    var blank = new zim.Rectangle(20,3,"white");
+                    container.addChild(blank);
+                    blank.regX = blank.getBounds().width/2;
+                    blank.regY = blank.getBounds().height;
+                    blank.x = container.getBounds().width/2;
+                    blank.y = container.getBounds().height;
+
+                } else {
+                    var container = new zim.Rectangle(25,50,"transparent");
+                    phraseContainer.addChild(container);
+                    container.x = pos;
+                    pos = container.x + 25;                    
+                }
+            }
+
+            return container;
+        }
+
+        createPhrase();
+
+        var letterBoard = new zim.Rectangle(390, 100,"lightgrey");
+        backdropContainer.addChild(letterBoard);
+        letterBoard.x = bdW/12;
+        letterBoard.y = bdH/8*5;
+
+        var letterBoardTitle = new zim.Rectangle(390, 50, "#BB5145");
+        letterBoard.addChild(letterBoardTitle);
+        letterBoardTitle.regY = letterBoardTitle.getBounds().height;
+        letterBoardTitle.y = 0;
+
+        var letterBoardTitleText = new createjs.Text("Select a letter here", "20px Arial", "white");
+        letterBoardTitle.addChild(letterBoardTitleText);
+        letterBoardTitleText.regX = letterBoardTitleText.getBounds().width/2;
+        letterBoardTitleText.regY = letterBoardTitleText.getBounds().height/2;
+        letterBoardTitleText.x = letterBoardTitle.getBounds().width/2;
+        letterBoardTitleText.y = letterBoardTitle.getBounds().height/2;
 
 
+        function createLetters() {
+            var posX = 0;
+            var posY = 0;
+            for(i=0;i<alphabet.length;i++){
 
+                // var letterBox = new zim.Rectangle(30,50,"#3FB07C");
+                var letterBox = new zim.Rectangle(30,50,"white");
+                letterBoard.addChild(letterBox);
+                letterBox.letter = alphabet[i];
+                if(posX >= 390){
+                    console.log(posX);
+                    posX = 0;
+                    posY = 50;
+                    letterBox.x = posX;
+                    letterBox.y = posY;
+                    posX = letterBox.x + 30;
+                } else {
+                    console.log(posX);
+                    letterBox.x = posX;
+                    letterBox.y = posY;
+                    posX = letterBox.x + 30;
+                }
+
+                var letter = new createjs.Text(alphabet[i], "20px Arial", "#BB5145");
+                letterBox.addChild(letter);
+                letter.regX = letter.getBounds().width/2;
+                letter.regY = letter.getBounds().height/2;
+                letter.x = letterBox.getBounds().width/2;
+                letter.y = letterBox.getBounds().height/2;
+                letter.alpha = 1;
+
+            }
+
+            return letterBox;
+
+        }
+
+        createLetters();
 
         stage.update(); 
     } 
