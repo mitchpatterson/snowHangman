@@ -50,7 +50,7 @@ frame.on("ready", function() {
         stage.addChild(bounds);
 
         var backdropContainer = new zim.Rectangle(800,600,"transparent");
-        bounds.addChild(backdropContainer);
+        stage.addChild(backdropContainer);
         backdropContainer.regX = backdropContainer.getBounds().width/2;
         backdropContainer.regY = backdropContainer.getBounds().height/2;
         backdropContainer.x = stageW/2;
@@ -59,24 +59,30 @@ frame.on("ready", function() {
         var bdH = backdropContainer.getBounds().height;
 
         var backdrop = new createjs.Bitmap(preload.getResult('backdrop'));
-        backdropContainer.addChild(backdrop);
+        stage.addChild(backdrop);
         zim.scaleTo(backdrop, backdropContainer, 100, 100);
+        backdrop.x = stageW/2;
+        backdrop.y = stageH/2;
+        backdrop.regX = backdrop.getBounds().width/2;
+        backdrop.regY = backdrop.getBounds().height/2;
 
         var snowmen = new zim.Rectangle(250,330,"transparent");
-        backdropContainer.addChild(snowmen);
+        stage.addChild(snowmen);
         snowmen.regX = snowmen.getBounds().width/2;
         snowmen.regY = snowmen.getBounds().height;
-        snowmen.x = bdW/7*5;
-        snowmen.y = bdH/3*2;
+        snowmen.x = stageW/2 + 150;
+        snowmen.y = stageH/4*3 - 50;
 
         var snowman1 = new createjs.Bitmap(preload.getResult('snowman1'));
-        snowmen.addChild(snowman1);
-        zim.scaleTo(snowman1, snowmen, 100, 100);
+        stage.addChild(snowman1);
+        snowman1.regX = snowman1.getBounds().width/2;
+        snowman1.regY = snowman1.getBounds().height;
+        snowman1.x = stageW/2 + 150;
+        snowman1.y = stageH/4*3 - 50;
+        zim.scaleTo(snowman1, snowman1, 100, 100);
 
-        var phraseContainer = new zim.Rectangle(400, 50,"transparent");
-        backdropContainer.addChild(phraseContainer);
-        phraseContainer.x = bdW/12;
-        phraseContainer.y = bdH/8;
+        var phraseContainer = new createjs.Container();
+        stage.addChild(phraseContainer);
 
         var alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
                         "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
@@ -92,15 +98,18 @@ frame.on("ready", function() {
                 phrase = phrases[rand];
             }
 
-            var pos = 0;
+            var pos = stageW/2 - 350;
             
             for(i=0; i<phrase.length; i++) {
                 if(phrase[i] != " ") {
 
                     var container = new zim.Rectangle(25,50,"transparent");
+                    container.alpha = 0;
                     phraseContainer.addChild(container);
                     container.x = pos;
+                    container.y = stageH/2 - 225;
                     pos = container.x + 25;
+                    container.letter = phrase[i];
 
                     var text = new createjs.Text(phrase[i], "20px Arial", "#BB5145");
                     container.addChild(text);
@@ -108,21 +117,21 @@ frame.on("ready", function() {
                     text.regY = text.getBounds().height/2;
                     text.x = container.getBounds().width/2;
                     text.y = container.getBounds().height/2;
-                    text.alpha = 0;
-                    container.letter = phrase[i];
 
                     var blank = new zim.Rectangle(20,3,"white");
-                    container.addChild(blank);
+                    stage.addChild(blank);
                     blank.regX = blank.getBounds().width/2;
                     blank.regY = blank.getBounds().height;
-                    blank.x = container.getBounds().width/2;
-                    blank.y = container.getBounds().height;
+                    blank.x = pos - 25 + container.getBounds().width/2;
+                    blank.y = stageH/2 - 225 + container.getBounds().height;
 
                 } else {
                     var container = new zim.Rectangle(25,50,"transparent");
-                    phraseContainer.addChild(container);
+                    stage.addChild(container);
                     container.x = pos;
-                    pos = container.x + 25;                    
+                    container.alpha = 0;
+                    pos = container.x + 25;
+                    container.letter = phrase[i];                    
                 }
             }
 
@@ -131,13 +140,14 @@ frame.on("ready", function() {
 
         createPhrase();
 
-        var letterBoard = new zim.Rectangle(390, 100,"lightgrey");
-        backdropContainer.addChild(letterBoard);
-        letterBoard.x = bdW/12;
-        letterBoard.y = bdH/8*5;
+        var letterBoard = new zim.Rectangle(390, 100,"#BB5145", "#BB5145", 3);
+        stage.addChild(letterBoard);
+        letterBoard.x = stageW/2 - 350;
+        letterBoard.y = stageH/2 + 100;
 
-        var letterBoardTitle = new zim.Rectangle(390, 50, "#BB5145");
+        var letterBoardTitle = new zim.Rectangle(390, 50, "#BB5145", "#BB5145", 3);
         letterBoard.addChild(letterBoardTitle);
+
         letterBoardTitle.regY = letterBoardTitle.getBounds().height;
         letterBoardTitle.y = 0;
 
@@ -148,37 +158,39 @@ frame.on("ready", function() {
         letterBoardTitleText.x = letterBoardTitle.getBounds().width/2;
         letterBoardTitleText.y = letterBoardTitle.getBounds().height/2;
 
+        createLetters();
 
         function createLetters() {
-            var posX = 0;
-            var posY = 0;
+            var posX = stageW/2 - 350;
+            var posY = stageH/2 + 100;
             for(i=0;i<alphabet.length;i++){
 
                 // var letterBox = new zim.Rectangle(30,50,"#3FB07C");
                 var letterBox = new zim.Rectangle(30,50,"white");
-                letterBoard.addChild(letterBox);
+                stage.addChild(letterBox);
                 letterBox.letter = alphabet[i];
-                if(posX >= 390){
-                    console.log(posX);
-                    posX = 0;
-                    posY = 50;
+                letterBox.addEventListener("click", guessLetter);
+
+                letterBox.letters = alphabet[i];
+                if(posX >= stageW/2 - 350 + 390){
+                    posX = stageW/2 - 350;
+                    posY = stageH/2 + 100 + 50;
                     letterBox.x = posX;
                     letterBox.y = posY;
                     posX = letterBox.x + 30;
                 } else {
-                    console.log(posX);
                     letterBox.x = posX;
                     letterBox.y = posY;
                     posX = letterBox.x + 30;
                 }
 
-                var letter = new createjs.Text(alphabet[i], "20px Arial", "#BB5145");
-                letterBox.addChild(letter);
-                letter.regX = letter.getBounds().width/2;
-                letter.regY = letter.getBounds().height/2;
-                letter.x = letterBox.getBounds().width/2;
-                letter.y = letterBox.getBounds().height/2;
-                letter.alpha = 1;
+                var letterz = new createjs.Text(alphabet[i], "20px Arial", "#BB5145");
+                letterBox.addChild(letterz);
+                letterz.regX = letterz.getBounds().width/2;
+                letterz.regY = letterz.getBounds().height/2;
+                letterz.x = letterBox.getBounds().width/2;
+                letterz.y = letterBox.getBounds().height/2;
+                letterz.alpha = 1;
 
             }
 
@@ -186,8 +198,29 @@ frame.on("ready", function() {
 
         }
 
-        createLetters();
+        function guessLetter(e){
+            for(i=0;i<phraseContainer.numChildren;i++){
+                if(phraseContainer.getChildAt(i).letter == e.target.letters){
+                    phraseContainer.getChildAt(i).alpha = 1;
+                    stage.update();
+                } 
+            }
+        }
 
+        // createjs.Ticker.framerate = 60;
+        // createjs.Ticker.on("tick", function(){
+        //     for(i=2;i<letterBoard.numChildren;i++){
+        //         letterBoard.getChildAt(i).addEventListener("click", function(){
+        //             console.log("clicked");
+        //         })
+        //     }
+        // })
+        
+        var bounding = bounds.getChildAt[0];
+        console.log(bounding);
+        
+
+        console.log("end of code");
         stage.update(); 
     } 
 
