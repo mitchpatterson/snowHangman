@@ -36,7 +36,9 @@ frame.on("ready", function() {
     
     var imagePath = "img/";
     var manifest = [{id:"backdrop", src:"backdrop.jpg"},
-                    {id:"snowman1", src:"snowman-full.png"}];
+                    {id:"snowman1", src:"snowman-full.png"},
+                    {id:"snowing1", src:"snowFall.png"},
+                    {id:"snowing2", src:"snowFall.png"}];
 
     var preload = new createjs.LoadQueue(false, imagePath);
     preload.loadManifest(manifest);
@@ -46,10 +48,10 @@ frame.on("ready", function() {
     function game() {
         console.log("____Snowman Hangman____"); 
 
-        var bounds = new zim.Rectangle(stageW, stageH, "#BB5145");
+        var bounds = new zim.Rectangle(stageW, stageH, "white");
         stage.addChild(bounds);
 
-        var backdropContainer = new zim.Rectangle(800,600,"transparent");
+        var backdropContainer = new zim.Rectangle(800,600,"transparent", "#BB5145", 7);
         stage.addChild(backdropContainer);
         backdropContainer.regX = backdropContainer.getBounds().width/2;
         backdropContainer.regY = backdropContainer.getBounds().height/2;
@@ -74,7 +76,6 @@ frame.on("ready", function() {
         snowmen.y = stageH/4*3 - 50;
 
         var snowman1 = new createjs.Bitmap(preload.getResult('snowman1'));
-        stage.addChild(snowman1);
         snowman1.regX = snowman1.getBounds().width/2;
         snowman1.regY = snowman1.getBounds().height;
         snowman1.x = stageW/2 + 150;
@@ -83,6 +84,23 @@ frame.on("ready", function() {
 
         var phraseContainer = new createjs.Container();
         stage.addChild(phraseContainer);
+
+        var snowing1 = new createjs.Bitmap(preload.getResult('snowing1'));
+        stage.addChild(snowing1);
+        snowing1.regX = snowing1.getBounds().width/2;
+        snowing1.regY = snowing1.getBounds().height/2;
+        snowing1.x = stageW/2;
+        snowing1.y = stageH/2;
+
+        var snowing2 = new createjs.Bitmap(preload.getResult('snowing2'));
+        stage.addChild(snowing2);
+        snowing2.regX = snowing2.getBounds().width/2;
+        snowing2.regY = snowing2.getBounds().height/2;
+        snowing2.x = stageW/2;
+        snowing2.y = stageH/2;
+
+        var scrollerSpeed = 3;
+        var scroller = new zim.Scroller(snowing1, snowing2, scrollerSpeed, -.2, false, 5);
 
         var alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
                         "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X",
@@ -170,6 +188,9 @@ frame.on("ready", function() {
                 stage.addChild(letterBox);
                 letterBox.letter = alphabet[i];
                 letterBox.addEventListener("click", guessLetter);
+                letterBox.addEventListener("mouseover", hoverOn);
+                letterBox.addEventListener("mouseout", hoverOff);
+                stage.enableMouseOver(20);
 
                 letterBox.letters = alphabet[i];
                 if(posX >= stageW/2 - 350 + 390){
@@ -198,29 +219,54 @@ frame.on("ready", function() {
 
         }
 
+        var winnerCount = 0;
         function guessLetter(e){
             for(i=0;i<phraseContainer.numChildren;i++){
                 if(phraseContainer.getChildAt(i).letter == e.target.letters){
                     phraseContainer.getChildAt(i).alpha = 1;
+                    winnerCount = winnerCount + 1;
                     stage.update();
                 } 
+
+                if(phraseContainer.numChildren == winnerCount){
+                    winnerFade.alpha = 0.9;
+                    winnerText.alpha = 1;
+                    stage.update();
+                }
+
+                stage.removeChild(e.target);
+
+                stage.update();
             }
         }
 
-        // createjs.Ticker.framerate = 60;
-        // createjs.Ticker.on("tick", function(){
-        //     for(i=2;i<letterBoard.numChildren;i++){
-        //         letterBoard.getChildAt(i).addEventListener("click", function(){
-        //             console.log("clicked");
-        //         })
-        //     }
-        // })
-        
-        var bounding = bounds.getChildAt[0];
-        console.log(bounding);
-        
+        function hoverOn(e) {
+            e.target.alpha = 0.5;
+            e.target.cursor = "pointer";
+            console.log("hovering");
+            stage.update();
+        }
 
-        console.log("end of code");
+        function hoverOff(e) {
+            e.target.alpha = 1;
+            stage.update();
+        }
+
+        var winnerFade = new zim.Rectangle(800,600,"black");
+        winnerFade.alpha = 0;
+        winnerFade.regX = winnerFade.getBounds().width/2;
+        winnerFade.regY = winnerFade.getBounds().height/2;
+        winnerFade.x = stageW/2;
+        winnerFade.y = stageH/2;
+        stage.addChild(winnerFade);
+        stage.addChild(snowman1);
+        
+        var winnerText = new createjs.Text("You saved the snowman!", "30px Arial", "white");
+        stage.addChild(winnerText);
+        winnerText.x = stageW/2 - 325;
+        winnerText.y = stageH/2 - 50;
+        winnerText.alpha = 0;
+
         stage.update(); 
     } 
 
