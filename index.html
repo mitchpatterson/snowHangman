@@ -37,6 +37,15 @@ frame.on("ready", function() {
     var imagePath = "img/";
     var manifest = [{id:"backdrop", src:"backdrop.jpg"},
                     {id:"snowman1", src:"snowman-full.png"},
+                    {id:"snowman2", src:"snowman-2.png"},
+                    {id:"snowman3", src:"snowman-3.png"},
+                    {id:"snowman4", src:"snowman-4.png"},
+                    {id:"snowman5", src:"snowman-5.png"},
+                    {id:"snowman6", src:"snowman-6.png"},
+                    {id:"snowman7", src:"snowman-final.png"},
+                    {id:"sun", src:"sun.png"},
+                    {id:"opening", src:"opening.png"},
+                    {id:"openingRules", src:"openingRules.png"},
                     {id:"snowing1", src:"snowFall.png"},
                     {id:"snowing2", src:"snowFall.png"}];
 
@@ -80,7 +89,58 @@ frame.on("ready", function() {
         snowman1.regY = snowman1.getBounds().height;
         snowman1.x = stageW/2 + 150;
         snowman1.y = stageH/4*3 - 50;
-        zim.scaleTo(snowman1, snowman1, 100, 100);
+        zim.scaleTo(snowman1, snowmen, 100, 100);
+
+        var snowman2 = new createjs.Bitmap(preload.getResult('snowman2'));
+        snowman2.regX = snowman2.getBounds().width/2;
+        snowman2.regY = snowman2.getBounds().height;
+        snowman2.x = stageW/2 + 150;
+        snowman2.y = stageH/4*3 - 50;
+        zim.scaleTo(snowman2, snowmen, 100, 100);
+
+        var snowman3 = new createjs.Bitmap(preload.getResult('snowman3'));
+        snowman3.regX = snowman3.getBounds().width/2;
+        snowman3.regY = snowman3.getBounds().height;
+        snowman3.x = stageW/2 + 150;
+        snowman3.y = stageH/4*3 - 50;
+        zim.scaleTo(snowman3, snowmen, 100, 100);
+
+        var snowman4 = new createjs.Bitmap(preload.getResult('snowman4'));
+        snowman4.regX = snowman4.getBounds().width/2;
+        snowman4.regY = snowman4.getBounds().height;
+        snowman4.x = stageW/2 + 150;
+        snowman4.y = stageH/4*3 - 50;
+        zim.scaleTo(snowman4, snowmen, 100, 100);
+
+        var snowman5 = new createjs.Bitmap(preload.getResult('snowman5'));
+        snowman5.regX = snowman5.getBounds().width/2;
+        snowman5.regY = snowman5.getBounds().height;
+        snowman5.x = stageW/2 + 150;
+        snowman5.y = stageH/4*3 - 50;
+        zim.scaleTo(snowman5, snowmen, 100, 100);
+
+        var snowman6 = new createjs.Bitmap(preload.getResult('snowman6'));
+        snowman6.regX = snowman6.getBounds().width/2;
+        snowman6.regY = snowman6.getBounds().height;
+        snowman6.x = stageW/2 + 150;
+        snowman6.y = stageH/4*3 - 50;
+        zim.scaleTo(snowman6, snowmen, 100, 100);
+
+        var snowman7 = new createjs.Bitmap(preload.getResult('snowman7'));
+        snowman7.regX = snowman7.getBounds().width/2;
+        snowman7.regY = snowman7.getBounds().height;
+        snowman7.x = stageW/2;
+        snowman7.y = stageH/4*3 - 25;
+        zim.scaleTo(snowman7, snowmen, 200, 200);
+
+        var snowmenArray = [snowman1, snowman2, snowman3, snowman4, snowman5, snowman6, snowman7];
+
+        var sunny = new createjs.Bitmap(preload.getResult('sun'));
+        sunny.regX = sunny.getBounds().width;
+        sunny.x = stageW/2 + 400;
+        sunny.y = stageH/2 - 450 + sunny.getBounds().height;
+        sunny.alpha = 0;
+        stage.addChild(sunny);
 
         var phraseContainer = new createjs.Container();
         stage.addChild(phraseContainer);
@@ -116,31 +176,31 @@ frame.on("ready", function() {
                 phrase = phrases[rand];
             }
 
-            var pos = stageW/2 - 350;
+            var pos = stageW/2 - 250;
             
             for(i=0; i<phrase.length; i++) {
                 if(phrase[i] != " ") {
 
-                    var container = new zim.Rectangle(25,50,"transparent");
+                    var container = new zim.Rectangle(35,50,"transparent");
                     container.alpha = 0;
                     phraseContainer.addChild(container);
                     container.x = pos;
                     container.y = stageH/2 - 225;
-                    pos = container.x + 25;
+                    pos = container.x + 35;
                     container.letter = phrase[i];
 
-                    var text = new createjs.Text(phrase[i], "20px Arial", "#BB5145");
+                    var text = new createjs.Text(phrase[i], "25px Arial", "#BB5145");
                     container.addChild(text);
                     text.regX = text.getBounds().width/2;
                     text.regY = text.getBounds().height/2;
                     text.x = container.getBounds().width/2;
                     text.y = container.getBounds().height/2;
 
-                    var blank = new zim.Rectangle(20,3,"white");
+                    var blank = new zim.Rectangle(20,3,"#BB5145");
                     stage.addChild(blank);
                     blank.regX = blank.getBounds().width/2;
                     blank.regY = blank.getBounds().height;
-                    blank.x = pos - 25 + container.getBounds().width/2;
+                    blank.x = pos - 35 + container.getBounds().width/2;
                     blank.y = stageH/2 - 225 + container.getBounds().height;
 
                 } else {
@@ -148,7 +208,7 @@ frame.on("ready", function() {
                     stage.addChild(container);
                     container.x = pos;
                     container.alpha = 0;
-                    pos = container.x + 25;
+                    pos = container.x + 35;
                     container.letter = phrase[i];                    
                 }
             }
@@ -220,17 +280,23 @@ frame.on("ready", function() {
         }
 
         var winnerCount = 0;
+        var voidCheck = false;
         function guessLetter(e){
             for(i=0;i<phraseContainer.numChildren;i++){
                 if(phraseContainer.getChildAt(i).letter == e.target.letters){
                     phraseContainer.getChildAt(i).alpha = 1;
                     winnerCount = winnerCount + 1;
+                    voidCheck = true;
                     stage.update();
                 } 
 
                 if(phraseContainer.numChildren == winnerCount){
-                    winnerFade.alpha = 0.9;
+                    winnerFade.alpha = 0.85;
                     winnerText.alpha = 1;
+                    snowmenArray[0].y = stageH/2 + (330/2);
+                    stage.addChild(tryAgain);
+                    tryAgain.x = stageW/2 - 325;
+                    tryAgain.y = stageH/2 + 50;
                     stage.update();
                 }
 
@@ -238,6 +304,40 @@ frame.on("ready", function() {
 
                 stage.update();
             }
+
+            if(voidCheck == false) {
+                if(snowmenArray.length > 2){
+                    createjs.Tween.get(sunny).to({alpha:1}, 1000);
+                    setTimeout(function(){
+                        stage.removeChild(snowmenArray[0]);
+                        snowmenArray.splice(0,1);
+                        stage.addChild(snowmenArray[0]);
+                        createjs.Tween.get(sunny).to({alpha:0}, 1000);
+                        stage.update();
+                    }, 1000)
+
+                } else {
+                    createjs.Tween.get(sunny).to({alpha:1}, 1000);
+                    setTimeout(function(){
+                        stage.removeChild(snowmenArray[0]);
+                        snowmenArray.splice(0,1);
+                        stage.addChild(snowmenArray[0]);
+                        winnerFade.alpha = 0.85;
+                        loserText.alpha = 1;
+
+                        stage.addChild(tryAgain);
+                        tryAgain.x = stageW/2 - 100;
+                        tryAgain.y = stageH/2 - 25;
+                        stage.update();
+                    },1000);
+
+                    stage.update();
+                        
+                }
+            } 
+
+            voidCheck = false;
+            stage.update();
         }
 
         function hoverOn(e) {
@@ -266,6 +366,62 @@ frame.on("ready", function() {
         winnerText.x = stageW/2 - 325;
         winnerText.y = stageH/2 - 50;
         winnerText.alpha = 0;
+
+        var tryAgain = new zim.Rectangle(200,50, "white", "#BB5145", 3);
+        tryAgain.cursor = "pointer";
+        tryAgain.on("click", function(){
+            game();
+        })
+
+        var tryAgainText = new createjs.Text("Play Again?", "20px Arial", "#BB5145");
+        tryAgain.addChild(tryAgainText);
+        tryAgainText.regX = tryAgainText.getBounds().width/2;
+        tryAgainText.regY = tryAgainText.getBounds().height/2;
+        tryAgainText.x = 100;
+        tryAgainText.y = 25; 
+
+        var loserText = new createjs.Text("Oh no! The snowman MELTED!", "40px Arial", "white");
+        stage.addChild(loserText);
+        loserText.regX = loserText.getBounds().width/2;
+        loserText.regY = loserText.getBounds().height/2;
+        loserText.x = stageW/2;
+        loserText.y = stageH/2 - 100;
+        loserText.alpha = 0;
+
+        var openingRules = new createjs.Bitmap(preload.getResult('openingRules'));
+        openingRules.regX = openingRules.getBounds().width/2;
+        openingRules.regY = openingRules.getBounds().height/2;
+        openingRules.x = stageW/2;
+        openingRules.y = stageH/2;
+
+        var openingRulesText = new createjs.Text("BEGIN", "40px Arial", "white");
+        openingRulesText.regX = openingRulesText.getBounds().width/2;
+        openingRulesText.regY = openingRulesText.getBounds().height/2;
+        openingRulesText.x = stageW/2;
+        openingRulesText.y = stageH/2 + 215;
+        openingRulesText.on("click", function(){
+            stage.removeChild(openingRulesText);
+            stage.removeChild(openingRules);
+        })
+
+        var opening = new createjs.Bitmap(preload.getResult('opening'));
+        stage.addChild(opening);
+        opening.regX = opening.getBounds().width/2;
+        opening.regY = opening.getBounds().height/2;
+        opening.x = stageW/2;
+        opening.y = stageH/2;
+
+        var openingText = new createjs.Text("START", "40px Arial", "white");
+        stage.addChild(openingText);
+        openingText.on("click", function(){
+            stage.removeChild(opening);
+            stage.removeChild(openingText);
+            stage.addChild(openingRules);
+            stage.addChild(openingRulesText);
+        });
+
+        openingText.x = stageW/2 + 235;
+        openingText.y = stageH/2 + 200;
 
         stage.update(); 
     } 
